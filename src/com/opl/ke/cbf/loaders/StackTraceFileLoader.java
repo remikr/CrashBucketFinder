@@ -15,7 +15,7 @@ public class StackTraceFileLoader {
 		
 		List<TraceElement> elements = new ArrayList<TraceElement>();
 		
-		System.out.println("###" + stackTraceFile.getAbsolutePath());
+		//System.out.println("###" + stackTraceFile.getAbsolutePath());
 		/**
 		 * Recupération du contenu du fichier
 		 */
@@ -27,7 +27,7 @@ public class StackTraceFileLoader {
 		while(in.hasNextLine()){
 			
 			String line = in.nextLine() + "\n";
-			
+	
 			if(line.startsWith("#")){
 				line = line.substring(1);
 				if(!tmpElement.isEmpty()){
@@ -49,7 +49,7 @@ public class StackTraceFileLoader {
 		 * Split par élément + gen
 		 */
 		
-		for(int i = 1; i < stringElements.size(); i ++){
+		for(int i = 0; i < stringElements.size(); i ++){
 			elements.add(generateStackElement(stringElements.get(i)));
 		}
 		
@@ -63,33 +63,38 @@ public class StackTraceFileLoader {
 	private static TraceElement generateStackElement(String elementString) {
 		int id = -1;
 		String methodname = "";
+		String memoryAdress = "";
 		String fileSource = "";
 		String details = "";
 		int lineInFileSource = -1;
+		String fileSourceDetails;
+		String vars;
 		
 		/**
 		 * Obtention numéro de ligne
 		 */
 		int value = Integer.parseInt(elementString.substring(0, elementString.indexOf(" ")));
-		
-		lineInFileSource = value;
-		
+		id = value;
 		elementString = elementString.substring(elementString.indexOf(" ")).trim();
 		
+		/**
+		 * ligne speciale
+		 */
 		if(elementString.startsWith("<")){
 			//TODO ajouter détail à trace element
-			return new TraceElement(id, methodname, fileSource, lineInFileSource);
+			return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource);
 		}
+		
 		
 		/**
 		 * Adresse mémoire
 		 */
-		
-		if(elementString.startsWith("Ox")){
-			String memoryAdress = elementString.substring(0, elementString.indexOf(" "));
-			elementString = elementString.substring(elementString.indexOf(" ")).trim();
-			
-			if(elementString.startsWith("in ")) elementString = elementString.substring(elementString.indexOf(" ")).trim();
+		if(elementString.startsWith("0x")){
+			memoryAdress = elementString.substring(0, elementString.indexOf(" "));	
+			elementString = elementString.substring(elementString.indexOf(" ")).trim();	
+			if(elementString.startsWith("in ")){
+				elementString = elementString.substring(elementString.indexOf(" ")).trim();
+			}
 		}
 		
 		
@@ -102,41 +107,64 @@ public class StackTraceFileLoader {
 		/**
 		 * Arguments méthode
 		 */
-		
 		//System.out.println("ELEMENT STRING1> " + elementString);
 		String arguments = elementString.substring(1, elementString.indexOf(")"));
 		elementString = elementString.substring(elementString.indexOf(")")+1).trim();
 		
-		//System.out.println("ELEMENT STRING2> " + elementString);
 		
-		if(elementString.startsWith(" from ") || elementString.startsWith(" at ")){
-			elementString = elementString.substring(elementString.indexOf((elementString.startsWith(" from "))?"from ":"at ")).trim();
+		/**
+		 * Fichier + ligne dans le fichier (at/from + :)
+		 */
+		if(elementString.startsWith("from ") || elementString.startsWith("at ")){
+			elementString = elementString.substring(elementString.indexOf((elementString.startsWith("from "))?"from ":"at ")).trim();
 			elementString = elementString.substring(elementString.indexOf(" ")).trim();
+			//System.out.println();
+			//System.out.print(elementString);
 			
-			String fileSourceDetails = elementString.substring(0, elementString.indexOf("\n"));
+			if(elementString.indexOf("\n") == -1){
+				fileSourceDetails = elementString;
+			}else{
+				fileSourceDetails = elementString.substring(0, elementString.indexOf("\n"));
+			}
 			
-			/**
-			 * Fichier + ligne dans le fichier (at/from + :)
-			 */
-			
-			System.out.println("----> " + fileSourceDetails );
+			//System.out.println("fileSourceDetails : " + fileSourceDetails );
 			if(fileSourceDetails.contains(":")){
 				String[] fileDetailsSplit;
 				fileDetailsSplit = fileSourceDetails.split(":");
 				fileSource = fileDetailsSplit[0];
 				lineInFileSource = Integer.parseInt(fileDetailsSplit[1]);
+				
 			} else {
-				fileSource = fileSourceDetails.substring(0, fileSourceDetails.lastIndexOf("."));
-				lineInFileSource = Integer.parseInt(fileSourceDetails.substring(fileSourceDetails.lastIndexOf(".")+1));
+				//des fois, il n'y a pas le numero de ligne
+				if( fileSourceDetails.substring(fileSourceDetails.lastIndexOf(".")+1).matches("[0-9]+")  ){
+					fileSource = fileSourceDetails.substring(0, fileSourceDetails.lastIndexOf("."));
+					lineInFileSource = Integer.parseInt(fileSourceDetails.substring(fileSourceDetails.lastIndexOf(".")+1));
+				}else{
+					fileSource = fileSourceDetails;
+				}
 			}
 			
-			elementString = elementString.substring(elementString.indexOf("\n")).trim();
-			/**
-			 * Vars ( = )
-			 */
+			if(elementString.indexOf("\n") != -1){
+				elementString = elementString.substring(elementString.indexOf("\n")).trim();
+			}
+		
 		}
 		
+		/**
+		 * Vars ( = )
+		 */
+		vars=elementString;
 		
-		return new TraceElement(id, methodname, fileSource, lineInFileSource);
+		
+
+		/*System.out.print("id : "+ id+";");
+		System.out.print("memory : "+ memoryAdress+";");
+		System.out.print("method : "+methodname+";");
+		System.out.print("file : "+fileSource+";");
+		System.out.print("lineN : "+lineInFileSource+";");*/
+		//System.out.print("vars : "+vars+";");
+		//System.out.println();
+		
+		return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource);
 	}
 }

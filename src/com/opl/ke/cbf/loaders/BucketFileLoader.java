@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.opl.ke.cbf.entities.Bucket;
 import com.opl.ke.cbf.entities.StackTrace;
 
 public class BucketFileLoader {
@@ -18,6 +19,7 @@ public class BucketFileLoader {
 		
 		for(int i = 0; i < traceFilesTab.length; i ++){
 			File tmpBetween = traceFilesTab[i];
+			
 			if(tmpBetween.exists() && tmpBetween.list().length > 0){
 				File trace = tmpBetween.listFiles()[0];
 				
@@ -28,6 +30,7 @@ public class BucketFileLoader {
 		}
 		
 		for(File stackTraceFile : traceFilesList){
+			//System.out.println("bucket:"+stackTraceFile.getPath());
 			try {
 				stackTraces.add(StackTraceFileLoader.getStackTraceFromFile(stackTraceFile));
 			} catch (FileNotFoundException e) {
@@ -35,6 +38,7 @@ public class BucketFileLoader {
 			}
 		}
 		
+		//System.out.println(" taille "+stackTraces.size());
 		return stackTraces;
 	}
 

@@ -2,6 +2,11 @@ package com.opl.ke.cbf.entities;
 
 import java.util.List;
 
+/**
+ * Represent a error file
+ * @author Admin
+ *
+ */
 public class StackTrace {
 
 	private String name;
