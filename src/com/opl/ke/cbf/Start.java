@@ -16,8 +16,8 @@ public class Start {
 
 	public static void main(String[] args) {
 		//String folderPath = "C:\\Users\\Geoffrey\\Desktop\\nautilus";
-		String folderPath = "C:\\Users\\Admin\\Desktop\\Cours\\Master2\\opl\\crash_bucket";
-		//String folderPath = args[0];
+		//String folderPath = "C:\\Users\\Admin\\Desktop\\Cours\\Master2\\opl\\crash_bucket";
+		String folderPath = args[0];
 		File folder = new File(folderPath);
 		Loader loader = new Loader();
 		
