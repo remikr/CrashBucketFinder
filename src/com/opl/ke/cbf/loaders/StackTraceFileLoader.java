@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -204,7 +203,7 @@ public class StackTraceFileLoader {
 						if(!varValue.contains("{") && !varValue.contains(",")){
 							if(!composed){
 								Variable var = new Variable(varName, varType, varValue);
-								System.out.println("Var : " + "\n\t name='" + varName + "'\n\t varType='"+ varType +"'\n\t value='"+varValue+"'");
+								//System.out.println("Var : " + "\n\t name='" + varName + "'\n\t varType='"+ varType +"'\n\t value='"+varValue+"'");
 								vars.add(var);
 							} else if(varValue.contains("}") && !varValue.contains(",")){
 								composed = false;

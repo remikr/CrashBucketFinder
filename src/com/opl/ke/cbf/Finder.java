@@ -65,13 +65,13 @@ public class Finder {
 			for(int j=0;j<buckets.size();j++){
 				bucket=buckets.get(j);
 				StackTraceScoring.files=new ArrayList<String>();
-				StackTraceScoring.methodes=new ArrayList<String>();
+				StackTraceScoring.methods=new ArrayList<String>();
 				
 				//pour chaque bucket stack
 				for(int k=0;k<bucket.getStacks().size();k++){
 					bucketStack=bucket.getStacks().get(k);	
 
-					bucketScore=bucketScore+StackTraceScoring.getScore(input,bucketStack);			
+					bucketScore=bucketScore+StackTraceScoring.getDistance(input,bucketStack);			
 				}
 				
 				inputScore.addScore(bucket, bucketScore);

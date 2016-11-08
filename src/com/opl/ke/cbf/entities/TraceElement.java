@@ -47,7 +47,7 @@ public class TraceElement {
 		this.memoryAdress=memoryAd;
 	}
 	
-	public String getMemoryAdresse(){
+	public String getMemoryAddress(){
 		return memoryAdress;
 	}
 
@@ -63,7 +63,7 @@ public class TraceElement {
 		this.fileSource = fileSource;
 	}
 
-	public final int getLineInFileSource() {
+	public final int getLineInSourceFile() {
 		return lineInFileSource;
 	}
 
