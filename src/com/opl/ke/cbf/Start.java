@@ -22,6 +22,7 @@ public class Start {
 		//String folderPath = "C:\\Users\\Geoffrey\\Desktop\\nautilus";
 		//String folderPath = "C:\\Users\\Admin\\Desktop\\Cours\\Master2\\opl\\crash_bucket";
 		String folderPath = args[0];
+		System.out.println("folder path : "+folderPath);
 		File folder = new File(folderPath);
 		Loader loader = new Loader();
 		
@@ -46,7 +47,7 @@ public class Start {
 		try {
 			finder.generateResults(export);
 		} catch (IOException e) {
-			System.out.println(e.getMessage() + " | Impossible de générer le fichier de résultats.");
+			System.out.println(e.getMessage() + " | Impossible de gï¿½nï¿½rer le fichier de rï¿½sultats.");
 		}
 		
 		/**

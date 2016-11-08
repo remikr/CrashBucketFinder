@@ -23,6 +23,7 @@ public class Loader {
 			File bucketFile = bucketsFile[i];
 			
 			if(bucketFile.exists()){
+				//System.out.println("bucket file : "+bucketFile.getName());
 				Bucket bucket = new Bucket(bucketFile.getName());
 				//System.out.println("bucket "+bucket.getName());
 				bucket.setStacks(BucketFileLoader.listStackTraces(bucketFile));

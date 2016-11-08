@@ -30,6 +30,7 @@ public class BucketFileLoader {
 		}
 		
 		for(File stackTraceFile : traceFilesList){
+			
 			//System.out.println("bucket:"+stackTraceFile.getPath());
 			try {
 				stackTraces.add(StackTraceFileLoader.getStackTraceFromFile(stackTraceFile));

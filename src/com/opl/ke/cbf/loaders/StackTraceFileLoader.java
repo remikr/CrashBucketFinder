@@ -1,10 +1,15 @@
 package com.opl.ke.cbf.loaders;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import com.opl.ke.cbf.entities.StackTrace;
 import com.opl.ke.cbf.entities.TraceElement;
@@ -18,36 +23,50 @@ public class StackTraceFileLoader {
 		
 		//System.out.println("###" + stackTraceFile.getAbsolutePath());
 		/**
-		 * Recupération du contenu du fichier
+		 * Recupï¿½ration du contenu du fichier
 		 */
 		List<String> stringElements = new ArrayList<String>();
 		
-		Scanner in = new Scanner(stackTraceFile);		
+		//Scanner in = new Scanner(stackTraceFile);
+		//in.useDelimiter(System.lineSeparator());
+		BufferedReader br = new BufferedReader(new FileReader(stackTraceFile));
 		
 		String tmpElement = "";
-		while(in.hasNextLine()){
-			
-			String line = in.nextLine() + "\n";
-	
-			if(line.startsWith("#")){
-				line = line.substring(1);
-				if(!tmpElement.isEmpty()){
-					stringElements.add(tmpElement);
-					tmpElement = "";
+		String line;
+		try {
+			while(
+					(line = br.readLine()) != null
+					//in.hasNextLine()
+					){
+				
+				line = line + "\n";
+				//line=in.nextLine() + "\n";
+				//System.out.print("lecture fichier : "+line);
+
+				if(line.startsWith("#")){
+					//nouvelle element
+					//System.out.print("nouvelle ligne : "+line);
+					line = line.substring(1);
+					//sauvegarde l'ancienne
+					if(!tmpElement.isEmpty()){
+						stringElements.add(tmpElement);
+						tmpElement = "";
+					}
 				}
+				
+				tmpElement += line;
 			}
-			tmpElement += line;
-		}
+		} catch (IOException e) {e.printStackTrace();}
 		
 		if(tmpElement != null){
 			stringElements.add(tmpElement);
 			tmpElement = "";
 		}
 		
-		in.close();
+		//in.close();
 		
 		/**
-		 * Split par élément + gen
+		 * Split par ï¿½lï¿½ment + gen
 		 */
 		
 		for(int i = 0; i < stringElements.size(); i ++){
@@ -70,24 +89,26 @@ public class StackTraceFileLoader {
 		String fileSourceDetails;
 		List<Variable> vars = new ArrayList<Variable>();
 		
+		//System.out.println(elementString);
 		/**
-		 * Obtention numéro de ligne
+		 * Obtention numï¿½ro de ligne
 		 */
 		int value = Integer.parseInt(elementString.substring(0, elementString.indexOf(" ")));
 		id = value;
 		elementString = elementString.substring(elementString.indexOf(" ")).trim();
+		//System.out.println(elementString);
 		
 		/**
 		 * ligne speciale
 		 */
 		if(elementString.startsWith("<")){
-			//TODO ajouter détail à trace element
+			//TODO ajouter dï¿½tail ï¿½ trace element
 			return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource);
 		}
 		
 		
 		/**
-		 * Adresse mémoire
+		 * Adresse mï¿½moire
 		 */
 		if(elementString.startsWith("0x")){
 			memoryAdress = elementString.substring(0, elementString.indexOf(" "));	
@@ -99,12 +120,15 @@ public class StackTraceFileLoader {
 		
 		
 		/**
-		 * Nom méthode
+		 * Nom mï¿½thode
 		 */
+		//System.out.println(elementString);
 		methodname = elementString.substring(0, elementString.indexOf(" "));
 		elementString = elementString.substring(elementString.indexOf(" ")).trim();
 		
-		elementString.substring(1, elementString.indexOf(")"));
+		/**
+		 * Arguments mï¿½thode
+		 */
 		elementString = elementString.substring(elementString.indexOf(")")+1).trim();
 		
 		
@@ -128,7 +152,11 @@ public class StackTraceFileLoader {
 				String[] fileDetailsSplit;
 				fileDetailsSplit = fileSourceDetails.split(":");
 				fileSource = fileDetailsSplit[0];
-				lineInFileSource = Integer.parseInt(fileDetailsSplit[1]);
+				int iEnd = indexOf( Pattern.compile("\n| ") , fileDetailsSplit[1] );
+				if(iEnd==-1){
+					iEnd=fileDetailsSplit[1].length();
+				}
+				lineInFileSource = Integer.parseInt( fileDetailsSplit[1].substring(0, iEnd) );
 				
 			} else {
 				//des fois, il n'y a pas le numero de ligne
@@ -194,5 +222,10 @@ public class StackTraceFileLoader {
 		//System.out.print("vars : "+vars+";");
 		//System.out.println();
 		return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource, vars);
+	}
+	
+	public static int indexOf(Pattern pattern, String s) {
+	    Matcher matcher = pattern.matcher(s);
+	    return matcher.find() ? matcher.start() : -1;
 	}
 }

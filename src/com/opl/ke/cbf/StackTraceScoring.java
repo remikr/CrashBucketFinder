@@ -27,9 +27,14 @@ public class StackTraceScoring {
 				trace2=st2.getElements().get(j);
 				
 				
+				/**
+				 * address
+				 */
 				if( 
 						!trace1.getMemoryAdresse().equals("") &&
-						trace1.getMemoryAdresse().equals(trace2.getMemoryAdresse())  ){
+						trace1.getMemoryAdresse().equals(trace2.getMemoryAdresse())  
+						){
+					
 					if( trace1.getId()== trace2.getId() ){
 						score=score+5;
 					}
@@ -37,10 +42,12 @@ public class StackTraceScoring {
 				}
 			
 			
-				if( !trace1.getMethodName().equals("??") &&  
+				if( 
+						!trace1.getMethodName().equals("??") &&  
 						trace1.getId()!=-1 &&
 						trace1.getMethodName().equals(trace2.getMethodName()) &&
-						trace1.getId()== trace2.getId() ){
+						trace1.getId()== trace2.getId() 
+						){
 					
 					if(!methodes.contains(trace1.getMethodName())){
 						methodes.add(trace1.getMethodName());
@@ -50,18 +57,18 @@ public class StackTraceScoring {
 				}
 				
 				
-				if( !trace1.getFileSource().equals("") &&
+				if(
+						!trace1.getFileSource().equals("") &&
 						trace1.getId()!=-1 &&
 						trace1.getFileSource().equals(trace2.getFileSource()) &&
 						trace1.getLineInFileSource() == trace2.getLineInFileSource() &&
-						trace1.getId()== trace2.getId() ){
+						trace1.getId()== trace2.getId() 
+						){
 					
-					if(!files.contains(trace1.getFileSource())){
+					if( !files.contains(trace1.getFileSource()) ){
 						files.add(trace1.getFileSource());
 						score=score+20;
 					}	
-			
-					
 				}
 				
 				
