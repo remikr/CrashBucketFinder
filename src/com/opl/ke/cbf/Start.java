@@ -54,10 +54,12 @@ public class Start {
 		 * Obtain global score
 		 */
 		try {
-			String ur="http://www.monperrus.net/martin/iagl-2016-crash-competition-result.py";
-			String post="?target=result&dataset="+args[1]+"&proposal="+String.join("\n" ,Files.readAllLines(export.toPath()));
+			if(args.length > 1){
+				String ur="http://www.monperrus.net/martin/iagl-2016-crash-competition-result.py";
+				String post="?target=result&dataset="+args[1]+"&proposal="+String.join("\n" ,Files.readAllLines(export.toPath()));
 			
-			System.out.print(executePost(ur, post));
+				System.out.print(executePost(ur, post));
+			}
 		} catch (MalformedURLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
