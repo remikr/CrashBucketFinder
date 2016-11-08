@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 import com.opl.ke.cbf.entities.StackTrace;
 import com.opl.ke.cbf.entities.TraceElement;
+import com.opl.ke.cbf.entities.Variable;
 
 public class StackTraceFileLoader {
 
@@ -65,10 +66,9 @@ public class StackTraceFileLoader {
 		String methodname = "";
 		String memoryAdress = "";
 		String fileSource = "";
-		String details = "";
 		int lineInFileSource = -1;
 		String fileSourceDetails;
-		String vars;
+		List<Variable> vars = new ArrayList<Variable>();
 		
 		/**
 		 * Obtention numéro de ligne
@@ -104,11 +104,7 @@ public class StackTraceFileLoader {
 		methodname = elementString.substring(0, elementString.indexOf(" "));
 		elementString = elementString.substring(elementString.indexOf(" ")).trim();
 		
-		/**
-		 * Arguments méthode
-		 */
-		//System.out.println("ELEMENT STRING1> " + elementString);
-		String arguments = elementString.substring(1, elementString.indexOf(")"));
+		elementString.substring(1, elementString.indexOf(")"));
 		elementString = elementString.substring(elementString.indexOf(")")+1).trim();
 		
 		
@@ -153,8 +149,41 @@ public class StackTraceFileLoader {
 		/**
 		 * Vars ( = )
 		 */
-		vars=elementString;
-		
+		if(!elementString.isEmpty()){
+			boolean composed = false;
+			for(String line : elementString.split("\n")){
+				if(line.contains(" = ")){
+					String varName ="";
+					String varType = "";
+					String varValue = "";
+					
+					String[] varDetails = line.split(" = ");
+					
+					if(varDetails.length > 1){
+						//Nom de la variable
+						varName = varDetails[0].trim();
+						
+						//Type de la variable
+						if(varDetails[1].contains("(") && varDetails[1].contains("*)")){
+							varType = varDetails[1].substring(varDetails[1].indexOf("(")+1, varDetails[1].indexOf("*)"));
+							varDetails[1] = varDetails[1].substring(varDetails[1].indexOf("*)")+2).trim();
+						}
+						
+						//Valeur de la variable (ou adresse mémoire)
+						varValue = varDetails[1].trim();
+												
+						//Variables simples uniquement (pas de variable composée)
+						if(!varValue.contains("{") && !varValue.contains(",")){
+							Variable var = new Variable(varName, varType, varValue);
+							//System.out.println("Var : " + "\n\t name='" + varName + "'\n\t varType='"+ varType +"'\n\t value='"+varValue+"'");
+							vars.add(var);
+						} else {
+							composed = true;
+						}
+					}
+				}
+			}
+		}
 		
 
 		/*System.out.print("id : "+ id+";");
@@ -164,7 +193,6 @@ public class StackTraceFileLoader {
 		System.out.print("lineN : "+lineInFileSource+";");*/
 		//System.out.print("vars : "+vars+";");
 		//System.out.println();
-		
-		return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource);
+		return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource, vars);
 	}
 }

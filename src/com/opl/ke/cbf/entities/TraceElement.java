@@ -18,17 +18,19 @@ public class TraceElement {
 	private List<Variable> vars;
 
 	public TraceElement(int id, String memoryAdress, String methodName, String fileSource, int lineInFileSource) {
+		this(id, memoryAdress, methodName, fileSource, lineInFileSource, new ArrayList<Variable>());
+	}
+	
+	public TraceElement(int id, String memoryAdress, String methodName, String fileSource, int lineInFileSource, List<Variable> variables) {
 		super();
 		this.id = id;
 		this.memoryAdress=memoryAdress;
 		this.methodName = methodName;
 		this.fileSource = fileSource;
 		this.lineInFileSource = lineInFileSource;
-		this.setVars(new ArrayList<Variable>());
+		this.setVars(variables);
 	}
 	
-	
-
 	public final String getMethodName() {
 		return methodName;
 	}

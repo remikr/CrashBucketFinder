@@ -15,7 +15,7 @@ public class Loader {
 	}
 	
 	public List<Bucket> loadBuckets(String folder){
-		File bucketsFolder = new File(folder, "nautilus-training");
+		File bucketsFolder = new File(folder, "training");
 		File[] bucketsFile = bucketsFolder.listFiles();
 		
 		List<Bucket> buckets = new ArrayList<Bucket>();
@@ -35,7 +35,7 @@ public class Loader {
 	}
 	
 	public List<StackTrace> loadInputs(String folder){
-		File tracesFolder = new File(folder, "nautilus-testing");
+		File tracesFolder = new File(folder, "testing");
 		List<StackTrace> inputs = new ArrayList<StackTrace>();
 		
 		if(tracesFolder.exists()){
