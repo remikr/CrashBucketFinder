@@ -83,7 +83,7 @@ public class StackTraceFileLoader {
 	private static TraceElement generateStackElement(String elementString) {
 		int id = -1;
 		String methodname = "";
-		String memoryAdress = "";
+		String memoryAddress = "";
 		String fileSource = "";
 		int lineInFileSource = -1;
 		String fileSourceDetails;
@@ -91,7 +91,7 @@ public class StackTraceFileLoader {
 		
 		//System.out.println(elementString);
 		/**
-		 * Obtention numï¿½ro de ligne
+		 * Line number
 		 */
 		int value = Integer.parseInt(elementString.substring(0, elementString.indexOf(" ")));
 		id = value;
@@ -99,19 +99,19 @@ public class StackTraceFileLoader {
 		//System.out.println(elementString);
 		
 		/**
-		 * ligne speciale
+		 * Special line
 		 */
 		if(elementString.startsWith("<")){
 			//TODO ajouter dï¿½tail ï¿½ trace element
-			return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource);
+			return new TraceElement(id, memoryAddress, methodname, fileSource, lineInFileSource);
 		}
 		
 		
 		/**
-		 * Adresse mï¿½moire
+		 * Memory Address
 		 */
 		if(elementString.startsWith("0x")){
-			memoryAdress = elementString.substring(0, elementString.indexOf(" "));	
+			memoryAddress = elementString.substring(0, elementString.indexOf(" "));	
 			elementString = elementString.substring(elementString.indexOf(" ")).trim();	
 			if(elementString.startsWith("in ")){
 				elementString = elementString.substring(elementString.indexOf(" ")).trim();
@@ -120,20 +120,20 @@ public class StackTraceFileLoader {
 		
 		
 		/**
-		 * Nom mï¿½thode
+		 * Method name
 		 */
 		//System.out.println(elementString);
 		methodname = elementString.substring(0, elementString.indexOf(" "));
 		elementString = elementString.substring(elementString.indexOf(" ")).trim();
 		
 		/**
-		 * Arguments mï¿½thode
+		 * Method arguments
 		 */
 		elementString = elementString.substring(elementString.indexOf(")")+1).trim();
 		
 		
 		/**
-		 * Fichier + ligne dans le fichier (at/from + :)
+		 * File + line in file (at/from + :)
 		 */
 		if(elementString.startsWith("from ") || elementString.startsWith("at ")){
 			elementString = elementString.substring(elementString.indexOf((elementString.startsWith("from "))?"from ":"at ")).trim();
@@ -159,7 +159,7 @@ public class StackTraceFileLoader {
 				lineInFileSource = Integer.parseInt( fileDetailsSplit[1].substring(0, iEnd) );
 				
 			} else {
-				//des fois, il n'y a pas le numero de ligne
+				//Sometimes, there's no line number
 				if( fileSourceDetails.substring(fileSourceDetails.lastIndexOf(".")+1).matches("[0-9]+")  ){
 					fileSource = fileSourceDetails.substring(0, fileSourceDetails.lastIndexOf("."));
 					lineInFileSource = Integer.parseInt(fileSourceDetails.substring(fileSourceDetails.lastIndexOf(".")+1));
@@ -188,23 +188,27 @@ public class StackTraceFileLoader {
 					String[] varDetails = line.split(" = ");
 					
 					if(varDetails.length > 1){
-						//Nom de la variable
+						//Var name
 						varName = varDetails[0].trim();
 						
-						//Type de la variable
+						//Var type
 						if(varDetails[1].contains("(") && varDetails[1].contains("*)")){
-							varType = varDetails[1].substring(varDetails[1].indexOf("(")+1, varDetails[1].indexOf("*)"));
+							varType = varDetails[1].substring(varDetails[1].indexOf("(")+1, varDetails[1].indexOf("*)")+1);
 							varDetails[1] = varDetails[1].substring(varDetails[1].indexOf("*)")+2).trim();
 						}
 						
-						//Valeur de la variable (ou adresse mémoire)
+						//Var value (or memory address)
 						varValue = varDetails[1].trim();
 												
-						//Variables simples uniquement (pas de variable composée)
+						//Only simple vars (No composed var)
 						if(!varValue.contains("{") && !varValue.contains(",")){
-							Variable var = new Variable(varName, varType, varValue);
-							//System.out.println("Var : " + "\n\t name='" + varName + "'\n\t varType='"+ varType +"'\n\t value='"+varValue+"'");
-							vars.add(var);
+							if(!composed){
+								Variable var = new Variable(varName, varType, varValue);
+								System.out.println("Var : " + "\n\t name='" + varName + "'\n\t varType='"+ varType +"'\n\t value='"+varValue+"'");
+								vars.add(var);
+							} else if(varValue.contains("}") && !varValue.contains(",")){
+								composed = false;
+							}
 						} else {
 							composed = true;
 						}
@@ -221,7 +225,7 @@ public class StackTraceFileLoader {
 		System.out.print("lineN : "+lineInFileSource+";");*/
 		//System.out.print("vars : "+vars+";");
 		//System.out.println();
-		return new TraceElement(id, memoryAdress, methodname, fileSource, lineInFileSource, vars);
+		return new TraceElement(id, memoryAddress, methodname, fileSource, lineInFileSource, vars);
 	}
 	
 	public static int indexOf(Pattern pattern, String s) {
