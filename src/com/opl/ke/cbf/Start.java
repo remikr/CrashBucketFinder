@@ -55,7 +55,7 @@ public class Start {
 		 */
 		try {
 			String ur="http://www.monperrus.net/martin/iagl-2016-crash-competition-result.py";
-			String post="?target=result&dataset=1&proposal="+String.join("\n" ,Files.readAllLines(export.toPath()));
+			String post="?target=result&dataset="+args[1]+"&proposal="+String.join("\n" ,Files.readAllLines(export.toPath()));
 			
 			System.out.print(executePost(ur, post));
 		} catch (MalformedURLException e) {
