@@ -5,7 +5,6 @@ import java.util.List;
 /**
  * Represent a error file
  * @author Admin
- *
  */
 public class StackTrace {
 

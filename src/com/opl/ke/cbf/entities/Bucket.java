@@ -3,6 +3,10 @@ package com.opl.ke.cbf.entities;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a bucket of StackTraces
+ * @author Geoffrey & Remi
+ */
 public class Bucket {
 	
 	private String name;

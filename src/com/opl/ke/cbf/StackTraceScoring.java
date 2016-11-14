@@ -6,12 +6,24 @@ import com.opl.ke.cbf.entities.StackTrace;
 import com.opl.ke.cbf.entities.TraceElement;
 import com.opl.ke.cbf.entities.Variable;
 
+/**
+ * 
+ * @author Geoffrey & Remi
+ *
+ */
 public class StackTraceScoring {
+	
+	/**
+	 * Source files found
+	 */
 	static ArrayList<String> files = null;
+	
+	/**
+	 * Methods found
+	 */
 	static ArrayList<String> methods = null;
 	
 	public StackTraceScoring() {
-		// TODO Auto-generated constructor stub
 	}
 	
 	public static int getDistance(StackTrace st1, StackTrace st2){
@@ -20,7 +32,9 @@ public class StackTraceScoring {
 		TraceElement trace2;
 		
 		
-		//comparaison des lignes
+		/**
+		 * Line compare
+		 */
 		for(int i=0;i<st1.getElements().size();i++){
 			trace1= st1.getElements().get(i);
 			
@@ -29,7 +43,7 @@ public class StackTraceScoring {
 				
 				
 				/**
-				 * address
+				 * Address compare
 				 */
 				if( 
 						!trace1.getMemoryAddress().equals("") &&
@@ -44,7 +58,9 @@ public class StackTraceScoring {
 			
 				
 				
-				
+				/**
+				 * Source file Path & Source file Line comparisons
+				 */
 				if(
 						!trace1.getFileSource().equals("") &&
 						trace1.getId()!=-1 &&
@@ -58,6 +74,9 @@ public class StackTraceScoring {
 						score=score+20;
 					}
 					
+					/**
+					 * Method name compare
+					 */
 					if( 
 							!trace1.getMethodName().equals("??") &&  
 							trace1.getId()!=-1 &&
@@ -70,6 +89,9 @@ public class StackTraceScoring {
 							score=score+20;
 						}	
 						
+						/**
+						 * Vars comparisons
+						 */
 						if(
 								!trace1.getVars().isEmpty() &&
 								trace1.getId()!=-1

@@ -14,39 +14,43 @@ import com.opl.ke.cbf.entities.StackTrace;
 import com.opl.ke.cbf.entities.TraceElement;
 import com.opl.ke.cbf.entities.Variable;
 
+/**
+ * StackTrace loader
+ * @author Geoffrey & Remi
+ *
+ */
 public class StackTraceFileLoader {
 
+	/**
+	 * Load a complete StackTrace from file
+	 * @param stackTraceFile
+	 * @return StackTrace
+	 * @throws FileNotFoundException
+	 */
 	public static StackTrace getStackTraceFromFile(File stackTraceFile) throws FileNotFoundException{
-		
+		/**
+		 * Elements of stack trace
+		 */
 		List<TraceElement> elements = new ArrayList<TraceElement>();
 		
-		//System.out.println("###" + stackTraceFile.getAbsolutePath());
 		/**
-		 * Recup�ration du contenu du fichier
+		 * Recovering file contents
 		 */
 		List<String> stringElements = new ArrayList<String>();
-		
-		//Scanner in = new Scanner(stackTraceFile);
-		//in.useDelimiter(System.lineSeparator());
+	
 		BufferedReader br = new BufferedReader(new FileReader(stackTraceFile));
 		
 		String tmpElement = "";
 		String line;
 		try {
-			while(
-					(line = br.readLine()) != null
-					//in.hasNextLine()
-					){
-				
+			while((line = br.readLine()) != null){
+			
 				line = line + "\n";
-				//line=in.nextLine() + "\n";
-				//System.out.print("lecture fichier : "+line);
 
 				if(line.startsWith("#")){
-					//nouvelle element
-					//System.out.print("nouvelle ligne : "+line);
+					//New element
 					line = line.substring(1);
-					//sauvegarde l'ancienne
+					//Save older
 					if(!tmpElement.isEmpty()){
 						stringElements.add(tmpElement);
 						tmpElement = "";
@@ -62,10 +66,8 @@ public class StackTraceFileLoader {
 			tmpElement = "";
 		}
 		
-		//in.close();
-		
 		/**
-		 * Split par �l�ment + gen
+		 * Split element + gen
 		 */
 		
 		for(int i = 0; i < stringElements.size(); i ++){
@@ -79,6 +81,11 @@ public class StackTraceFileLoader {
 		return stackTrace;
 	}
 
+	/**
+	 * Load complete TraceElement from String element
+	 * @param elementString
+	 * @return Trace Element
+	 */
 	private static TraceElement generateStackElement(String elementString) {
 		int id = -1;
 		String methodname = "";
@@ -88,20 +95,17 @@ public class StackTraceFileLoader {
 		String fileSourceDetails;
 		List<Variable> vars = new ArrayList<Variable>();
 		
-		//System.out.println(elementString);
 		/**
 		 * Line number
 		 */
 		int value = Integer.parseInt(elementString.substring(0, elementString.indexOf(" ")));
 		id = value;
 		elementString = elementString.substring(elementString.indexOf(" ")).trim();
-		//System.out.println(elementString);
 		
 		/**
 		 * Special line
 		 */
 		if(elementString.startsWith("<")){
-			//TODO ajouter d�tail � trace element
 			return new TraceElement(id, memoryAddress, methodname, fileSource, lineInFileSource);
 		}
 		
@@ -121,7 +125,6 @@ public class StackTraceFileLoader {
 		/**
 		 * Method name
 		 */
-		//System.out.println(elementString);
 		methodname = elementString.substring(0, elementString.indexOf(" "));
 		elementString = elementString.substring(elementString.indexOf(" ")).trim();
 		
@@ -137,8 +140,6 @@ public class StackTraceFileLoader {
 		if(elementString.startsWith("from ") || elementString.startsWith("at ")){
 			elementString = elementString.substring(elementString.indexOf((elementString.startsWith("from "))?"from ":"at ")).trim();
 			elementString = elementString.substring(elementString.indexOf(" ")).trim();
-			//System.out.println();
-			//System.out.print(elementString);
 			
 			if(elementString.indexOf("\n") == -1){
 				fileSourceDetails = elementString;
@@ -146,7 +147,6 @@ public class StackTraceFileLoader {
 				fileSourceDetails = elementString.substring(0, elementString.indexOf("\n"));
 			}
 			
-			//System.out.println("fileSourceDetails : " + fileSourceDetails );
 			if(fileSourceDetails.contains(":")){
 				String[] fileDetailsSplit;
 				fileDetailsSplit = fileSourceDetails.split(":");
@@ -158,7 +158,6 @@ public class StackTraceFileLoader {
 				lineInFileSource = Integer.parseInt( fileDetailsSplit[1].substring(0, iEnd) );
 				
 			} else {
-				//Sometimes, there's no line number
 				if( fileSourceDetails.substring(fileSourceDetails.lastIndexOf(".")+1).matches("[0-9]+")  ){
 					fileSource = fileSourceDetails.substring(0, fileSourceDetails.lastIndexOf("."));
 					lineInFileSource = Integer.parseInt(fileSourceDetails.substring(fileSourceDetails.lastIndexOf(".")+1));
@@ -187,23 +186,30 @@ public class StackTraceFileLoader {
 					String[] varDetails = line.split(" = ");
 					
 					if(varDetails.length > 1){
-						//Var name
+						/**
+						 * Var name
+						 */
 						varName = varDetails[0].trim();
 						
-						//Var type
+						/**
+						 * Var type
+						 */
 						if(varDetails[1].contains("(") && varDetails[1].contains("*)")){
 							varType = varDetails[1].substring(varDetails[1].indexOf("(")+1, varDetails[1].indexOf("*)")+1);
 							varDetails[1] = varDetails[1].substring(varDetails[1].indexOf("*)")+2).trim();
 						}
 						
-						//Var value (or memory address)
+						/**
+						 * Var value (or memory address)
+						 */
 						varValue = varDetails[1].trim();
 												
-						//Only simple vars (No composed var)
+						/**
+						 * Only simple vars (No composed var)
+						 */
 						if(!varValue.contains("{") && !varValue.contains(",")){
 							if(!composed){
 								Variable var = new Variable(varName, varType, varValue);
-								//System.out.println("Var : " + "\n\t name='" + varName + "'\n\t varType='"+ varType +"'\n\t value='"+varValue+"'");
 								vars.add(var);
 							} else if(varValue.contains("}") && !varValue.contains(",")){
 								composed = false;
@@ -215,15 +221,7 @@ public class StackTraceFileLoader {
 				}
 			}
 		}
-		
-
-		/*System.out.print("id : "+ id+";");
-		System.out.print("memory : "+ memoryAdress+";");
-		System.out.print("method : "+methodname+";");
-		System.out.print("file : "+fileSource+";");
-		System.out.print("lineN : "+lineInFileSource+";");*/
-		//System.out.print("vars : "+vars+";");
-		//System.out.println();
+	
 		return new TraceElement(id, memoryAddress, methodname, fileSource, lineInFileSource, vars);
 	}
 	

@@ -16,13 +16,16 @@ import com.opl.ke.cbf.entities.Bucket;
 import com.opl.ke.cbf.entities.StackTrace;
 import com.opl.ke.cbf.loaders.Loader;
 
+/**
+ * 
+ * @author Geoffrey & Remi
+ *
+ */
 public class Start {
 
 	public static void main(String[] args) {
-		//String folderPath = "C:\\Users\\Geoffrey\\Desktop\\nautilus";
-		//String folderPath = "C:\\Users\\Admin\\Desktop\\Cours\\Master2\\opl\\crash_bucket";
 		String folderPath = args[0];
-		System.out.println("folder path : "+folderPath);
+		System.out.println("Folder path : "+folderPath);
 		File folder = new File(folderPath);
 		Loader loader = new Loader();
 		
@@ -47,7 +50,7 @@ public class Start {
 		try {
 			finder.generateResults(export);
 		} catch (IOException e) {
-			System.out.println(e.getMessage() + " | Impossible de g�n�rer le fichier de r�sultats.");
+			System.out.println(e.getMessage() + " | Unable to generate results file.");
 		}
 		
 		/**
@@ -67,11 +70,19 @@ public class Start {
 		}
 	}
 	
+	/**
+	 * Execute post request
+	 * @param targetURL
+	 * @param urlParameters
+	 * @return String result
+	 */
 	public static String executePost(String targetURL, String urlParameters) {
 		HttpURLConnection connection = null;
 
 		try {
-			//Create connection
+			/**
+			 * Create connection
+			 */
 			URL url = new URL(targetURL);
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("POST");
@@ -85,16 +96,20 @@ public class Start {
 			connection.setUseCaches(false);
 			connection.setDoOutput(true);
 
-			//Send request
+			/**
+			 * Send request
+			 */
 			DataOutputStream wr = new DataOutputStream (
 					connection.getOutputStream());
 			wr.writeBytes(urlParameters);
 			wr.close();
 
-			//Get Response  
+			/**
+			 * Get Response  
+			 */
 			InputStream is = connection.getInputStream();
 			BufferedReader rd = new BufferedReader(new InputStreamReader(is));
-			StringBuilder response = new StringBuilder(); // or StringBuffer if Java version 5+
+			StringBuilder response = new StringBuilder();
 			String line;
 			while ((line = rd.readLine()) != null) {
 				response.append(line);

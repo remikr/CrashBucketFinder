@@ -1,5 +1,9 @@
 package com.opl.ke.cbf.entities;
-
+/**
+ * Represents a Variable of TraceElement
+ * @author Geoffrey & Remi
+ *
+ */
 public class Variable {
 	
 	private String name;
