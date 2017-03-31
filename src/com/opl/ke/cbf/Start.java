@@ -15,6 +15,10 @@ import java.util.List;
 import com.opl.ke.cbf.entities.Bucket;
 import com.opl.ke.cbf.entities.StackTrace;
 import com.opl.ke.cbf.loaders.Loader;
+import com.opl.ke.cbf.scoring.SimpleStackTraceScoring;
+import com.opl.ke.cbf.scoring.IStackTraceScoring;
+import com.opl.ke.cbf.scoring.IdStackTraceScoring;
+import com.opl.ke.cbf.scoring.MemoryStackTraceScoring;
 
 /**
  * 
@@ -24,9 +28,22 @@ import com.opl.ke.cbf.loaders.Loader;
 public class Start {
 
 	public static void main(String[] args) {
+		long begin1 = System.nanoTime();
 		String folderPath = args[0];
+		String scoring = args[1];
 		System.out.println("Folder path : "+folderPath);
 		File folder = new File(folderPath);
+		
+		IStackTraceScoring stackTraceScoring;
+		if(scoring == "Simple"){
+			stackTraceScoring = new SimpleStackTraceScoring();
+		}else if(scoring.equals("Id")){
+			stackTraceScoring = new IdStackTraceScoring();
+		}else{
+			stackTraceScoring = new MemoryStackTraceScoring();
+		}
+
+		
 		Loader loader = new Loader();
 		
 		/**
@@ -37,10 +54,13 @@ public class Start {
 		 * Load StackTraces
 		 */
 		List<StackTrace> inputs = loader.loadInputs(folderPath); 
+		
+		long end1 = System.nanoTime();
+    	long begin2 = System.nanoTime();
 		/**
 		 * Find results
 		 */
-		Finder finder = new Finder(buckets);
+		Finder finder = new Finder(buckets,stackTraceScoring);
 		finder.run(inputs);
 		
 		/**
@@ -53,13 +73,19 @@ public class Start {
 			System.out.println(e.getMessage() + " | Unable to generate results file.");
 		}
 		
+		long end2 = System.nanoTime();
+		System.out.println((end1-begin1));
+    	System.out.println((end2-begin2));
+    	System.out.println((end1-begin1)/ 1000000000);
+    	System.out.println((end2-begin2)/ 1000000000);
+		
 		/**
 		 * Obtain global score
 		 */
 		try {
-			if(args.length > 1){
+			if(args.length > 2){
 				String ur="http://www.monperrus.net/martin/iagl-2016-crash-competition-result.py";
-				String post="?target=result&dataset="+args[1]+"&proposal="+String.join("\n" ,Files.readAllLines(export.toPath()));
+				String post="?target=result&dataset="+args[2]+"&proposal="+String.join("\n" ,Files.readAllLines(export.toPath()));
 			
 				System.out.print(executePost(ur, post));
 			}
@@ -68,6 +94,7 @@ public class Start {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 	}
 	
 	/**

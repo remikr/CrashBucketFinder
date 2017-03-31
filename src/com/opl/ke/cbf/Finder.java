@@ -10,6 +10,8 @@ import java.util.Map;
 
 import com.opl.ke.cbf.entities.Bucket;
 import com.opl.ke.cbf.entities.StackTrace;
+import com.opl.ke.cbf.scoring.IStackTraceScoring;
+import com.opl.ke.cbf.scoring.MemoryStackTraceScoring;
 
 /**
  * 
@@ -32,11 +34,14 @@ public class Finder {
 	 * Bucket by tested stacktraces
 	 */
 	private Map<String, Integer> stats;
+	
+	private IStackTraceScoring stackTraceScoring;
 
-	public Finder(List<Bucket> buckets) {
+	public Finder(List<Bucket> buckets, IStackTraceScoring stackTraceScoring) {
 		this.buckets = buckets;
 		stats = new HashMap<String,Integer>();
 		this.inputsScore=new ArrayList<InputScore>();
+		this.stackTraceScoring = stackTraceScoring;
 	}
 
 	/**
@@ -84,8 +89,8 @@ public class Finder {
 			 */
 			for(int j=0;j<buckets.size();j++){
 				bucket=buckets.get(j);
-				StackTraceScoring.files=new ArrayList<String>();
-				StackTraceScoring.methods=new ArrayList<String>();
+				
+				stackTraceScoring.init();
 				
 				/**
 				 * For each bucket's stack
@@ -93,7 +98,7 @@ public class Finder {
 				for(int k=0;k<bucket.getStacks().size();k++){
 					bucketStack=bucket.getStacks().get(k);	
 
-					bucketScore=bucketScore+StackTraceScoring.getDistance(input,bucketStack);			
+					bucketScore=bucketScore+stackTraceScoring.getDistance(input,bucketStack);			
 				}
 				
 				inputScore.addScore(bucket, bucketScore);

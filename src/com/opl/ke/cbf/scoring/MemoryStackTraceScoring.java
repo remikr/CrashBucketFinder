@@ -1,4 +1,4 @@
-package com.opl.ke.cbf;
+package com.opl.ke.cbf.scoring;
 
 import java.util.ArrayList;
 
@@ -11,7 +11,7 @@ import com.opl.ke.cbf.entities.Variable;
  * @author Geoffrey & Remi
  *
  */
-public class StackTraceScoring {
+public class MemoryStackTraceScoring implements IStackTraceScoring {
 	
 	/**
 	 * Source files found
@@ -23,10 +23,17 @@ public class StackTraceScoring {
 	 */
 	static ArrayList<String> methods = null;
 	
-	public StackTraceScoring() {
+	public MemoryStackTraceScoring() {
 	}
 	
-	public static int getDistance(StackTrace st1, StackTrace st2){
+	@Override
+	public void init() {
+		this.files=new ArrayList<String>();
+		this.methods=new ArrayList<String>();
+		
+	}
+	
+	public int getDistance(StackTrace st1, StackTrace st2){
 		int score=0;
 		TraceElement trace1;
 		TraceElement trace2;
@@ -89,26 +96,7 @@ public class StackTraceScoring {
 							score=score+20;
 						}	
 						
-						/**
-						 * Vars comparisons
-						 */
-						if(
-								!trace1.getVars().isEmpty() &&
-								trace1.getId()!=-1
-								){
-							for(Variable var : trace1.getVars()){
-								for(Variable varRef : trace2.getVars()){
-									if(var.getName().equals(varRef.getName())){
-										score=score+10;
-										if(!var.getType().isEmpty()){
-											if(var.getType().equals(varRef.getType())) score=score+8;
-										} else {
-											if(var.getValue().equals(varRef.getValue())) score=score+16;
-										}
-									}
-								}
-							}
-						}
+					
 				
 					}
 					
@@ -119,5 +107,7 @@ public class StackTraceScoring {
 		}
 		return score;
 	}
-	
+
+
+
 }
